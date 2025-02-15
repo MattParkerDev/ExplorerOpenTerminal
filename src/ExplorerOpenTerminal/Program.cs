@@ -12,36 +12,8 @@ class Program
 {
 	private static readonly Guid _iidIShellBrowser = typeof(IShellBrowser).GUID;
 
-	[DllImport("user32.dll", CharSet = CharSet.Auto)]
-    static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
-
-    [DllImport("user32.dll")]
-    static extern IntPtr GetForegroundWindow();
-
-    [DllImport("user32.dll")]
-    static extern bool GetGUIThreadInfo(uint idThread, ref GUITHREADINFO lpgui);
-
-    [StructLayout(LayoutKind.Sequential)]
-    struct GUITHREADINFO
-    {
-        public int cbSize;
-        public int flags;
-        public IntPtr hwndActive;
-        public IntPtr hwndFocus;
-        public IntPtr hwndCapture;
-        public IntPtr hwndMenuOwner;
-        public IntPtr hwndMoveSize;
-        public IntPtr hwndCaret;
-        public RECT rcCaret;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct RECT
-    {
-        public int left, top, right, bottom;
-    }
-
-    public record HandleAndFolderPath(IntPtr Handle, string? FolderPath);
+	[UnmanagedFunctionPointer(CallingConvention.StdCall)]
+	private delegate int GetActiveTabDelegate(IntPtr shellBrowser, out IntPtr thisTabPointer);
 
     [STAThread]
     public static void Main()
@@ -76,6 +48,7 @@ class Program
 
 	static string? GetActiveExplorerTabPath(IntPtr hwnd)
 	{
+		// The first result is the active tab
 		IntPtr activeTab = PInvoke.FindWindowEx(new HWND(hwnd), new HWND(IntPtr.Zero), "ShellTabWindowClass", null); // Windows 11 File Explorer
 
 		var shellWindows123 = (IShellWindows)new ShellWindows();
@@ -120,7 +93,4 @@ class Program
 
 		return null;
 	}
-
-	[UnmanagedFunctionPointer(CallingConvention.StdCall)]
-	private delegate int GetActiveTabDelegate(IntPtr shellBrowser, out IntPtr thisTabPointer);
 }
