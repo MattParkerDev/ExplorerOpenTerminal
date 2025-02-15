@@ -42,7 +42,7 @@ class Program
     {
 	    var pathFromActiveTab = GetActiveExplorerTabPath(activeWindow);
 	    GC.Collect();
-	    GC.WaitForPendingFinalizers(); // if we try to create another Shell.Application it will blow up unless the COM object has been released
+	    GC.WaitForPendingFinalizers(); // if we try to create another Shell.Application it will blow up unless the COM object has been released // Not necessary in this case, but keeping for reference
 	    return pathFromActiveTab;
     }
 
