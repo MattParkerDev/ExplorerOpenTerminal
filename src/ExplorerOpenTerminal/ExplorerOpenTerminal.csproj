@@ -3,13 +3,19 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net9.0-windows</TargetFramework>
+	<PlatformTarget>x64</PlatformTarget> <!-- Required to generate some IShellBrowser related methods (CsWin32) -->
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.WindowsDesktop.App" />
     <PackageReference Include="Microsoft.Windows.Compatibility" Version="9.0.2" />
+    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.183">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Vanara.PInvoke.Shell32" Version="4.0.5" />
     <PackageReference Include="Vanara.PInvoke.UIAutomation" Version="4.0.5" />
     <PackageReference Include="Vanara.PInvoke.User32" Version="4.0.5" />
