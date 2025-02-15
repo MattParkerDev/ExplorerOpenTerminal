@@ -1,21 +1,18 @@
-﻿using System;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.Marshalling;
+﻿using System.Runtime.InteropServices;
 using System.Text;
-using System.Windows.Automation;
 using Windows.Win32;
 using Windows.Win32.UI.Shell;
+using Ardalis.GuardClauses;
 using Vanara.Extensions;
-using Vanara.Extensions.Reflection;
 using Vanara.PInvoke;
-using Vanara.Windows.Shell;
 using HWND = Windows.Win32.Foundation.HWND;
 using IServiceProvider = Windows.Win32.System.Com.IServiceProvider;
 
 class Program
 {
-    [DllImport("user32.dll", CharSet = CharSet.Auto)]
+	private static readonly Guid _iidIShellBrowser = typeof(IShellBrowser).GUID;
+
+	[DllImport("user32.dll", CharSet = CharSet.Auto)]
     static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
 
     [DllImport("user32.dll")]
@@ -66,7 +63,7 @@ class Program
         var folderPath = GetActiveExplorerPath(activeWindow);
         Console.WriteLine("Active Explorer Path: " + folderPath);
 
-        Console.ReadLine();
+        //Console.ReadLine();
     }
 
     static string? GetActiveExplorerPath(IntPtr activeWindow)
@@ -81,7 +78,8 @@ class Program
 	{
 		IntPtr activeTab = PInvoke.FindWindowEx(new HWND(hwnd), new HWND(IntPtr.Zero), "ShellTabWindowClass", null); // Windows 11 File Explorer
 
-		IShellWindows shellWindows123 = (IShellWindows)new ShellWindows();
+		var shellWindows123 = (IShellWindows)new ShellWindows();
+		Guard.Against.Null(shellWindows123);
 		for (var i = 0; i < shellWindows123.Count; i++)
 		{
 			var windowObject = shellWindows123.Item(i);
@@ -93,18 +91,18 @@ class Program
 			var windowPath = window!.Document.Folder.Self.Path as string;
 			var webBrowser2 = (IWebBrowser2) windowObject;
 			webBrowser2.QueryInterface(typeof(IServiceProvider).GUID, out var serviceProviderObject);
+			Guard.Against.Null(serviceProviderObject);
 			var serviceProvider = (IServiceProvider) serviceProviderObject;
-			Guid SID_STopLevelBrowser = new Guid("4C96BE40-915C-11CF-99D3-00AA004AE837");
-			Guid IID_IShellBrowser = typeof(IShellBrowser).GUID;
-			serviceProvider.QueryService(in SID_STopLevelBrowser, in IID_IShellBrowser, out var ppv);
-			var shellBrowser2 = (IShellBrowser) ppv;
 
-			IntPtr comPtr = Marshal.GetComInterfaceForObject(shellBrowser2, typeof(IShellBrowser));
+			serviceProvider.QueryService(in PInvoke.SID_STopLevelBrowser, in _iidIShellBrowser, out var shellBrowserObject);
+			var shellBrowser = (IShellBrowser) shellBrowserObject;
+
+			IntPtr comPtr = Marshal.GetComInterfaceForObject(shellBrowser, typeof(IShellBrowser));
 			IntPtr vTable = Marshal.ReadIntPtr(comPtr);
 			int start = Marshal.GetStartComSlot(typeof(IShellBrowser));
 			int end = Marshal.GetEndComSlot(typeof(IShellBrowser));
 
-			ComMemberType mType = 0;
+			//ComMemberType mType = 0;
 			for (var j = start; j <= end; j++)
 			{
 				//System.Reflection.MemberInfo mi = Marshal.GetMethodInfoForComSlot(typeof(IShellBrowser), i, ref mType);
@@ -113,9 +111,8 @@ class Program
 			}
 			var functionPointer = Marshal.ReadIntPtr(vTable, start * Marshal.SizeOf<nint>());
 			var delegate2 = Marshal.GetDelegateForFunctionPointer<GetActiveTabDelegate>(functionPointer);
-			delegate2(comPtr, out var thisTab123);
-			var supposedActiveTabPointer = (IntPtr) thisTab123;
-			if (supposedActiveTabPointer == activeTab)
+			delegate2(comPtr, out var windowTabPointer);
+			if (windowTabPointer == activeTab)
 			{
 				return windowPath;
 			}
@@ -125,5 +122,5 @@ class Program
 	}
 
 	[UnmanagedFunctionPointer(CallingConvention.StdCall)]
-	delegate int GetActiveTabDelegate(IntPtr shellBrowser, out uint thisTabPointer);
+	private delegate int GetActiveTabDelegate(IntPtr shellBrowser, out IntPtr thisTabPointer);
 }
