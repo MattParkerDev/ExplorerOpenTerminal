@@ -12,8 +12,6 @@ class Program
 {
 	private static readonly Guid _iidIShellBrowser = typeof(IShellBrowser).GUID;
 
-	[UnmanagedFunctionPointer(CallingConvention.StdCall)]
-	private delegate int GetActiveTabDelegate(IntPtr shellBrowser, out IntPtr thisTabPointer);
 
     [STAThread]
     public static void Main()
@@ -70,25 +68,12 @@ class Program
 			serviceProvider.QueryService(in PInvoke.SID_STopLevelBrowser, in _iidIShellBrowser, out var shellBrowserObject);
 			var shellBrowser = (IShellBrowser) shellBrowserObject;
 
-			IntPtr comPtr = Marshal.GetComInterfaceForObject(shellBrowser, typeof(IShellBrowser));
-			IntPtr vTable = Marshal.ReadIntPtr(comPtr);
-			int start = Marshal.GetStartComSlot(typeof(IShellBrowser));
-			int end = Marshal.GetEndComSlot(typeof(IShellBrowser));
-
-			//ComMemberType mType = 0;
-			for (var j = start; j <= end; j++)
-			{
-				//System.Reflection.MemberInfo memberInfo = Marshal.GetMethodInfoForComSlot(typeof(IShellBrowser), i, ref mType);
-				var functionAddress = Marshal.ReadIntPtr(vTable, j * Marshal.SizeOf<nint>()).ToInt64();
-				Console.WriteLine("Method {0} at address 0x{1:X}", "memberInfo.Name", functionAddress);
-			}
-			var functionPointer = Marshal.ReadIntPtr(vTable, start * Marshal.SizeOf<nint>());
-			var delegate2 = Marshal.GetDelegateForFunctionPointer<GetActiveTabDelegate>(functionPointer);
-			delegate2(comPtr, out var windowTabPointer);
-			if (windowTabPointer == activeTab)
+			shellBrowser.GetWindow(out var windowHandle);
+			if (windowHandle == activeTab)
 			{
 				return windowPath;
 			}
+
 		}
 
 		return null;
