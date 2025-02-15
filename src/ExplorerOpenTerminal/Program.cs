@@ -40,11 +40,7 @@ class Program
 
     public static void Main()
     {
-		// Get previous focus before terminal opens
-        //IntPtr activeWindow = GetPreviouslyFocusedWindow();
-        //Thread.Sleep(1000);
-        var activeWindow = User32.GetForegroundWindow().DangerousGetHandle();
-        IntPtr activeWindow2 = GetForegroundWindow();
+	    var activeWindow = User32.GetForegroundWindow().DangerousGetHandle();
 
         // Get class name of the active window
         var classNameBuilder = new StringBuilder(256);
@@ -67,7 +63,7 @@ class Program
     static string GetActiveExplorerPath(IntPtr activeWindow)
     {
 	    var handleAndFolderPaths = GetExplorerWindows();
-	    return "";
+	    return handleAndFolderPaths.First(s => s.Handle == activeWindow).FolderPath;
     }
 
     private static List<HandleAndFolderPath> GetExplorerWindows()

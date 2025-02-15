@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ExplorerOpenTerminal": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}
