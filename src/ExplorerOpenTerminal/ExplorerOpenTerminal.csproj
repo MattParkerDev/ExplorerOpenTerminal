@@ -9,12 +9,11 @@
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.WindowsDesktop.App" />
-    <PackageReference Include="Azure.Bicep.Core" Version="0.33.93" />
-    <PackageReference Include="Microsoft.Windows.Compatibility" Version="9.0.1" />
-    <PackageReference Include="UIAComWrapper" Version="1.1.0.14" />
-    <PackageReference Include="Vanara.PInvoke.Shell32" Version="4.0.4" />
-    <PackageReference Include="Vanara.PInvoke.UIAutomation" Version="4.0.4" />
-    <PackageReference Include="Vanara.PInvoke.User32" Version="4.0.4" />
+    <PackageReference Include="Microsoft.Windows.Compatibility" Version="9.0.2" />
+    <PackageReference Include="Vanara.PInvoke.Shell32" Version="4.0.5" />
+    <PackageReference Include="Vanara.PInvoke.UIAutomation" Version="4.0.5" />
+    <PackageReference Include="Vanara.PInvoke.User32" Version="4.0.5" />
+    <PackageReference Include="Vanara.Windows.Shell" Version="4.0.5" />
   </ItemGroup>
 
 </Project>
