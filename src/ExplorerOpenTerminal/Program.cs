@@ -36,12 +36,15 @@ class Program
         public int left, top, right, bottom;
     }
 
-    static void Main()
+    public record HandleAndFolderPath(IntPtr Handle, string? FolderPath);
+
+    public static void Main()
     {
 		// Get previous focus before terminal opens
         //IntPtr activeWindow = GetPreviouslyFocusedWindow();
-        var activeWindow = Vanara.PInvoke.User32.GetForegroundWindow();
-        //IntPtr activeWindow = GetForegroundWindow();
+        //Thread.Sleep(1000);
+        var activeWindow = User32.GetForegroundWindow().DangerousGetHandle();
+        IntPtr activeWindow2 = GetForegroundWindow();
 
         // Get class name of the active window
         var classNameBuilder = new StringBuilder(256);
@@ -49,69 +52,46 @@ class Program
 
         var className = classNameBuilder.ToString();
         // Check if the active window is a Windows Explorer instance
-        if (className is "CabinetWClass")
+        if (className is not "CabinetWClass")
         {
-            User32.GetWindowThreadProcessId(activeWindow, out var processId);
-            if (processId == 0)
-            {
-                Console.WriteLine("Failed to get process ID.");
-                return;
-            }
-
-            var process = Process.GetProcessById((int)processId);
-            if (process?.ProcessName is not "explorer")
-            {
-                Console.WriteLine("Active window is not an Explorer window.");
-                return;
-            }
-
-            //var automationElement = AutomationElement.FromHandle(activeWindow.DangerousGetHandle());
-            //ArgumentNullException.ThrowIfNull(automationElement);
-            //
-            //var condition = new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Edit);
-            //AutomationElement editElement = automationElement.FindFirst(TreeScope.Descendants, condition);
-            //ArgumentNullException.ThrowIfNull(editElement);
-            //string folderPath = editElement?.GetCurrentPropertyValue(ValuePattern.ValueProperty) as string;
-            var folderPath = GetActiveExplorerPath();
-            Console.WriteLine("Active Explorer Path: " + folderPath);
+	        Console.WriteLine("Active window is not an Explorer window.");
+	        return;
         }
-        else
-        {
-            Console.WriteLine("Active window is not an Explorer window.");
-        }
+
+        var folderPath = GetActiveExplorerPath(activeWindow);
+        Console.WriteLine("Active Explorer Path: " + folderPath);
 
         Console.ReadLine();
     }
 
-    static string GetActiveExplorerPath()
+    static string GetActiveExplorerPath(IntPtr activeWindow)
     {
-        try
-        {
-            // Create Shell.Application COM object
-            Type shellAppType = Type.GetTypeFromProgID("Shell.Application");
-            dynamic shellApp = Activator.CreateInstance(shellAppType);
-
-            // Get all open Explorer windows
-            dynamic windows = shellApp.Windows();
-
-            foreach (var window in windows)
-            {
-                if (window == null) continue;
-
-                IntPtr hwnd = new IntPtr((int)window.HWND);
-
-                // Compare hwnd with the active window
-                if (hwnd == GetForegroundWindow())
-                {
-                    return window.Document.Folder.Self.Path;
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Error: " + ex.Message);
-        }
-
-        return null;
+	    var handleAndFolderPaths = GetExplorerWindows();
+	    return "";
     }
+
+    private static List<HandleAndFolderPath> GetExplorerWindows()
+	{
+	    List<HandleAndFolderPath> handleAndFolderPaths = [];
+
+	    // Create Shell.Application COM object
+	    var shellAppType = Type.GetTypeFromProgID("Shell.Application");
+	    ArgumentNullException.ThrowIfNull(shellAppType);
+	    dynamic? shellApp = Activator.CreateInstance(shellAppType);
+	    ArgumentNullException.ThrowIfNull(shellApp);
+
+	    // Get all open Explorer windows
+	    var windows = shellApp!.Windows();
+
+	    foreach (var window in windows)
+	    {
+		    if (window == null) continue;
+
+		    var handlerPointer = new IntPtr((int)window.HWND);
+		    var folderPath = window.Document.Folder.Self.Path as string;
+
+		    handleAndFolderPaths.Add(new HandleAndFolderPath(handlerPointer, folderPath));
+	    }
+	    return handleAndFolderPaths;
+	}
 }
