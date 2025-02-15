@@ -78,9 +78,9 @@ class Program
 			//ComMemberType mType = 0;
 			for (var j = start; j <= end; j++)
 			{
-				//System.Reflection.MemberInfo mi = Marshal.GetMethodInfoForComSlot(typeof(IShellBrowser), i, ref mType);
-				var functionPointer2 = Marshal.ReadIntPtr(vTable, j * Marshal.SizeOf<nint>());
-				Console.WriteLine("Method {0} at address 0x{1:X}", "mi.Name", functionPointer2.ToInt64());
+				//System.Reflection.MemberInfo memberInfo = Marshal.GetMethodInfoForComSlot(typeof(IShellBrowser), i, ref mType);
+				var functionAddress = Marshal.ReadIntPtr(vTable, j * Marshal.SizeOf<nint>()).ToInt64();
+				Console.WriteLine("Method {0} at address 0x{1:X}", "memberInfo.Name", functionAddress);
 			}
 			var functionPointer = Marshal.ReadIntPtr(vTable, start * Marshal.SizeOf<nint>());
 			var delegate2 = Marshal.GetDelegateForFunctionPointer<GetActiveTabDelegate>(functionPointer);
