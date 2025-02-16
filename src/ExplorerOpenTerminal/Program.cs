@@ -72,7 +72,7 @@ public class Program
 
 	private static void CallAltTab()
 	{
-		const int delay = 10;
+		const int delay = 2;
 		Thread.Sleep(delay);
 		PInvoke.keybd_event((byte)VIRTUAL_KEY.VK_MENU,0xb8,0 , 0); //Alt Press
 		Thread.Sleep(delay);
