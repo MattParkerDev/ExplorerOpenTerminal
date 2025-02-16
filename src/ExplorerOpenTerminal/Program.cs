@@ -21,13 +21,18 @@ public class Program
 	public static void Main()
 	{
 		// do not start the shortcut to this as minimised - minimised windows are not allowed to set focus to other windows
-		Thread.Sleep(500); // This allows the current process to become the foreground window
-		var thisHandle = Process.GetCurrentProcess().MainWindowHandle;
-		//PInvoke.SetFocus(new HWND(thisHandle));
-		var previouslyActiveHandle = PInvoke.SetActiveWindow(new HWND(thisHandle));
-		Console.WriteLine("Previously active Window Handle: " + previouslyActiveHandle);
 
+		Thread.Sleep(500); // This allows the current process to become the foreground window
 		var (activeWindow, className) = GetFocusedWindow();
+
+		// var thisHandle = Process.GetCurrentProcess().MainWindowHandle;
+		// if (thisHandle != activeWindow)
+		// {
+		// 	var previouslyActiveHandle = PInvoke.SetActiveWindow(new HWND(thisHandle));
+		// 	Console.WriteLine("Previously active Window Handle: " + previouslyActiveHandle);
+		// }
+
+		//(activeWindow, className) = GetFocusedWindow();
 		if (className is not "CabinetWClass")
 		{
 			Console.WriteLine($"Active window ({className}) is not an Explorer window, calling Alt+Tab");
