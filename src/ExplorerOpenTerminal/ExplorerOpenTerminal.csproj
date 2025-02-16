@@ -1,13 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <TargetFramework>net9.0-windows</TargetFramework>
 	<PlatformTarget>x64</PlatformTarget> <!-- Required to generate some IShellBrowser related methods (CsWin32) -->
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PublishSingleFile>true</PublishSingleFile>
-	<UseWindowsForms>true</UseWindowsForms> <!-- Required to use System.Windows.Forms.SendKeys.SendWait() -->
   </PropertyGroup>
 
   <ItemGroup>

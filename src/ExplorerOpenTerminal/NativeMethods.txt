@@ -1,4 +1,6 @@
 ﻿FindWindowEx
+SetFocus
+SetActiveWindow
 
 IWebBrowser2
 IShellBrowser

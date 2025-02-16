@@ -21,7 +21,12 @@ public class Program
 	public static void Main()
 	{
 		// do not start the shortcut to this as minimised - minimised windows are not allowed to set focus to other windows
-		//Thread.Sleep(500);
+		Thread.Sleep(500);
+		var thisHandle = Process.GetCurrentProcess().MainWindowHandle;
+		//PInvoke.SetFocus(new HWND(thisHandle));
+		var previouslyActiveHandle = PInvoke.SetActiveWindow(new HWND(thisHandle));
+		Console.WriteLine("Previously active Window Handle: " + previouslyActiveHandle);
+
 		var (activeWindow, className) = GetFocusedWindow();
 		if (className is not "CabinetWClass")
 		{
@@ -105,7 +110,7 @@ public class Program
 	private static string? GetActiveExplorerTabPath(IntPtr hwnd)
 	{
 		// The first result is the active tab
-		IntPtr activeTab = PInvoke.FindWindowEx(new HWND(hwnd), new HWND(IntPtr.Zero), "ShellTabWindowClass", null); // Windows 11 File Explorer
+		IntPtr activeTab = PInvoke.FindWindowEx(new HWND(hwnd), new HWND(IntPtr.Zero), "ShellTabWindowClass", null);
 
 		var shellWindows123 = (IShellWindows)new ShellWindows();
 		Guard.Against.Null(shellWindows123);
