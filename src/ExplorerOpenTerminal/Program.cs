@@ -141,7 +141,6 @@ public static class Program
 			{
 				return windowPath;
 			}
-
 		}
 
 		return null;
