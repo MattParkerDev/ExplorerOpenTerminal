@@ -1,6 +1,4 @@
 ﻿FindWindowEx
-SetFocus
-SetActiveWindow
 SendInput
 GetAsyncKeyState
 GetForegroundWindow
@@ -13,5 +11,4 @@ ShellWindows
 
 IServiceProvider
 SID_STopLevelBrowser
-keybd_event
 VIRTUAL_KEY
