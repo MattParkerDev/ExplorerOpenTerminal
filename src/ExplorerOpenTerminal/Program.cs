@@ -70,6 +70,7 @@ public static class Program
 		return className;
 	}
 
+	// I don't like doing this, if there's a better way to get the previously active window, I'd prefer to do that
 	private static void CallAltTab()
 	{
 		const int delay = 2;
