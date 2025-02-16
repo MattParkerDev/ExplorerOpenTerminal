@@ -80,12 +80,16 @@ public static class Program
 		var altUpInput = altDownInput with { dwFlags = KEYBD_EVENT_FLAGS.KEYEVENTF_KEYUP };
 
 		// The user has most likely invoked this program via a shortcut on the desktop, along with a keybind. The shortcut must contain the alt key, and if still held, will mess with our alt tab
-		// Lets wait until the alt key is released
+		// Lets wait until the alt key is released (and ctrl & tab lol)
 		var altKeyState = PInvoke.GetAsyncKeyState((int)VIRTUAL_KEY.VK_MENU);
-		while (altKeyState is not 0)
+		var ctrlKeyState = PInvoke.GetAsyncKeyState((int)VIRTUAL_KEY.VK_CONTROL);
+		var tabKeyState = PInvoke.GetAsyncKeyState((int)VIRTUAL_KEY.VK_TAB);
+		while (altKeyState is not 0 || ctrlKeyState is not 0 || tabKeyState is not 0)
 		{
 			Thread.Sleep(20);
 			altKeyState = PInvoke.GetAsyncKeyState((int)VIRTUAL_KEY.VK_MENU);
+			ctrlKeyState = PInvoke.GetAsyncKeyState((int)VIRTUAL_KEY.VK_CONTROL);
+			tabKeyState = PInvoke.GetAsyncKeyState((int)VIRTUAL_KEY.VK_TAB);
 		}
 
 
