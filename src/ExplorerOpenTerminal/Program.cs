@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Text;
 using Windows.Win32;
-using Windows.Win32.System.Variant;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Windows.Win32.UI.Shell;
 using Ardalis.GuardClauses;
