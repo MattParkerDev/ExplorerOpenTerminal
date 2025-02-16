@@ -8,62 +8,64 @@ using Vanara.PInvoke;
 using HWND = Windows.Win32.Foundation.HWND;
 using IServiceProvider = Windows.Win32.System.Com.IServiceProvider;
 
-class Program
+namespace ExplorerOpenTerminal;
+
+public class Program
 {
 	private static readonly Guid _iidIShellBrowser = typeof(IShellBrowser).GUID;
 
 
-    [STAThread]
-    public static void Main()
-    {
-	    var activeWindow = User32.GetForegroundWindow().DangerousGetHandle();
-
-        // Get class name of the active window
-        var classNameBuilder = new StringBuilder(256);
-        User32.GetClassName(activeWindow, classNameBuilder, classNameBuilder.Capacity);
-
-        var className = classNameBuilder.ToString();
-        // Check if the active window is a Windows Explorer instance
-        if (className is not "CabinetWClass")
-        {
-	        Console.WriteLine("Active window is not an Explorer window.");
-	        return;
-        }
-
-        var folderPath = GetActiveExplorerPath(activeWindow);
-        Console.WriteLine("Active Explorer Path: " + folderPath);
-        if (string.IsNullOrWhiteSpace(folderPath))
-		{
-	        Console.WriteLine("Active explorer path is null, returning");
-	        return;
-		}
-        LaunchWindowsTerminalInDirectory(folderPath);
-    }
-
-    private static void LaunchWindowsTerminalInDirectory(string directory)
+	[STAThread]
+	public static void Main()
 	{
-	    var process = new Process
-	    {
-		    StartInfo = new ProcessStartInfo
-		    {
-			    FileName = "wt",
-			    Arguments = $"""-d "{directory}" """,
-			    UseShellExecute = false,
-			    CreateNoWindow = true,
-		    }
-	    };
-	    process.Start();
+		var activeWindow = User32.GetForegroundWindow().DangerousGetHandle();
+
+		// Get class name of the active window
+		var classNameBuilder = new StringBuilder(256);
+		User32.GetClassName(activeWindow, classNameBuilder, classNameBuilder.Capacity);
+
+		var className = classNameBuilder.ToString();
+		// Check if the active window is a Windows Explorer instance
+		if (className is not "CabinetWClass")
+		{
+			Console.WriteLine("Active window is not an Explorer window.");
+			return;
+		}
+
+		var folderPath = GetActiveExplorerPath(activeWindow);
+		Console.WriteLine("Active Explorer Path: " + folderPath);
+		if (string.IsNullOrWhiteSpace(folderPath))
+		{
+			Console.WriteLine("Active explorer path is null, returning");
+			return;
+		}
+		LaunchWindowsTerminalInDirectory(folderPath);
 	}
 
-    static string? GetActiveExplorerPath(IntPtr activeWindow)
-    {
-	    var pathFromActiveTab = GetActiveExplorerTabPath(activeWindow);
-	    GC.Collect();
-	    GC.WaitForPendingFinalizers(); // if we try to create another Shell.Application it will blow up unless the COM object has been released // Not necessary in this case, but keeping for reference
-	    return pathFromActiveTab;
-    }
+	private static void LaunchWindowsTerminalInDirectory(string directory)
+	{
+		var process = new Process
+		{
+			StartInfo = new ProcessStartInfo
+			{
+				FileName = "wt",
+				Arguments = $"""-d "{directory}" """,
+				UseShellExecute = false,
+				CreateNoWindow = true,
+			}
+		};
+		process.Start();
+	}
 
-	static string? GetActiveExplorerTabPath(IntPtr hwnd)
+	private static string? GetActiveExplorerPath(IntPtr activeWindow)
+	{
+		var pathFromActiveTab = GetActiveExplorerTabPath(activeWindow);
+		GC.Collect();
+		GC.WaitForPendingFinalizers(); // if we try to create another Shell.Application it will blow up unless the COM object has been released // Not necessary in this case, but keeping for reference
+		return pathFromActiveTab;
+	}
+
+	private static string? GetActiveExplorerTabPath(IntPtr hwnd)
 	{
 		// The first result is the active tab
 		IntPtr activeTab = PInvoke.FindWindowEx(new HWND(hwnd), new HWND(IntPtr.Zero), "ShellTabWindowClass", null); // Windows 11 File Explorer
