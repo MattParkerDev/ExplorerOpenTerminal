@@ -11,7 +11,7 @@ using IServiceProvider = Windows.Win32.System.Com.IServiceProvider;
 
 namespace ExplorerOpenTerminal;
 
-public class Program
+public static class Program
 {
 	private static readonly Guid _iidIShellBrowser = typeof(IShellBrowser).GUID;
 
