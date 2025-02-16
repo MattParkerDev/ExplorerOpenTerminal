@@ -3,6 +3,8 @@ SetFocus
 SetActiveWindow
 SendInput
 GetAsyncKeyState
+GetForegroundWindow
+GetClassName
 
 IWebBrowser2
 IShellBrowser

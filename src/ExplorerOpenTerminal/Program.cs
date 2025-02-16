@@ -5,8 +5,6 @@ using Windows.Win32;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Windows.Win32.UI.Shell;
 using Ardalis.GuardClauses;
-using Vanara.Extensions;
-using Vanara.PInvoke;
 using HWND = Windows.Win32.Foundation.HWND;
 using IServiceProvider = Windows.Win32.System.Com.IServiceProvider;
 
@@ -55,18 +53,17 @@ public static class Program
 
 	private static (IntPtr, string) GetForegroundWindow()
 	{
-		var activeWindow = User32.GetForegroundWindow().DangerousGetHandle();
-		var className = GetWindowName(activeWindow);
+		var activeWindow = PInvoke.GetForegroundWindow();
+		var className = GetWindowClassName(activeWindow);
 		return (activeWindow, className);
 	}
 
-	private static string GetWindowName(IntPtr windowHandle)
+	private static string GetWindowClassName(HWND windowHandle)
 	{
-		// Get class name of the active window
-		var classNameBuilder = new StringBuilder(256);
-		User32.GetClassName(windowHandle, classNameBuilder, classNameBuilder.Capacity);
+		Span<char> charSpan = stackalloc char[256];
+		PInvoke.GetClassName(windowHandle, charSpan);
 
-		var className = classNameBuilder.ToString();
+		var className = charSpan.ToString().Trim('\0'); // Trim null characters
 		return className;
 	}
 
@@ -144,9 +141,8 @@ public static class Program
 
 			var windowPath = window!.Document.Folder.Self.Path as string;
 			var webBrowser2 = (IWebBrowser2) windowObject;
-			webBrowser2.QueryInterface(typeof(IServiceProvider).GUID, out var serviceProviderObject);
-			Guard.Against.Null(serviceProviderObject);
-			var serviceProvider = (IServiceProvider) serviceProviderObject;
+
+			var serviceProvider = (IServiceProvider) webBrowser2;
 
 			serviceProvider.QueryService(in PInvoke.SID_STopLevelBrowser, in _iidIShellBrowser, out var shellBrowserObject);
 			var shellBrowser = (IShellBrowser) shellBrowserObject;
