@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Text;
 using Windows.Win32;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
@@ -73,17 +74,19 @@ public static class Program
 	{
 		const int delay = 2;
 		Thread.Sleep(delay);
-		PInvoke.keybd_event((byte)VIRTUAL_KEY.VK_MENU,0xb8,0 , 0); //Alt Press
+		var altDownInput = new KEYBDINPUT { wVk = VIRTUAL_KEY.VK_MENU, wScan = 0xb8, dwFlags = 0, dwExtraInfo = 0 };
+		var tabDownInput = new KEYBDINPUT { wVk = VIRTUAL_KEY.VK_TAB, wScan = 0x8f, dwFlags = 0, dwExtraInfo = 0 };
+		var tabUpInput = tabDownInput with { dwFlags = KEYBD_EVENT_FLAGS.KEYEVENTF_KEYUP };
+		var altUpInput = altDownInput with { dwFlags = KEYBD_EVENT_FLAGS.KEYEVENTF_KEYUP };
+
+		PInvoke.SendInput([new INPUT {type = INPUT_TYPE.INPUT_KEYBOARD, Anonymous = { ki = altDownInput}}], Marshal.SizeOf<INPUT>());
 		Thread.Sleep(delay);
-		PInvoke.keybd_event((byte)VIRTUAL_KEY.VK_TAB,0x8f,0 , 0); // Tab Press
+		PInvoke.SendInput([new INPUT {type = INPUT_TYPE.INPUT_KEYBOARD, Anonymous = { ki = tabDownInput}}], Marshal.SizeOf<INPUT>());
 		Thread.Sleep(delay);
-		PInvoke.keybd_event((byte)VIRTUAL_KEY.VK_TAB,0x8f, KEYBD_EVENT_FLAGS.KEYEVENTF_KEYUP,0); // Tab Release
+		PInvoke.SendInput([new INPUT {type = INPUT_TYPE.INPUT_KEYBOARD, Anonymous = { ki = tabUpInput}}], Marshal.SizeOf<INPUT>());
 		Thread.Sleep(delay);
-		PInvoke.keybd_event((byte)VIRTUAL_KEY.VK_MENU,0xb8,KEYBD_EVENT_FLAGS.KEYEVENTF_KEYUP,0); // Alt Release
+		PInvoke.SendInput([new INPUT {type = INPUT_TYPE.INPUT_KEYBOARD, Anonymous = { ki = altUpInput}}], Marshal.SizeOf<INPUT>());
 		Thread.Sleep(delay);
-		//SendKeys.SendWait("%{Tab}");
-		//SendKeys.Flush();
-		//Thread.Sleep(10);
 	}
 
 	private static void LaunchWindowsTerminalInDirectory(string directory)
