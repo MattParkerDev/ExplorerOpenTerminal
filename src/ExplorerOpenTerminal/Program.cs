@@ -1,6 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Text;
 using Windows.Win32;
+using Windows.Win32.System.Variant;
+using Windows.Win32.UI.Input.KeyboardAndMouse;
 using Windows.Win32.UI.Shell;
 using Ardalis.GuardClauses;
 using Vanara.Extensions;
@@ -18,17 +20,18 @@ public class Program
 	[STAThread]
 	public static void Main()
 	{
-		//SendKeys.Send("%{Tab}");
+		// do not start the shortcut to this as minimised - minimised windows are not allowed to set focus to other windows
 		//Thread.Sleep(500);
 		var (activeWindow, className) = GetFocusedWindow();
 		if (className is not "CabinetWClass")
 		{
+			Console.WriteLine($"Active window ({className}) is not an Explorer window, calling Alt+Tab");
 			CallAltTab();
 			(activeWindow, className) = GetFocusedWindow();
 		}
 		if (className is not "CabinetWClass")
 		{
-			Console.WriteLine("Active window is not an Explorer window.");
+			Console.WriteLine($"Active window ({className}) is not an Explorer window.");
 			return;
 		}
 
@@ -45,20 +48,35 @@ public class Program
 	private static (IntPtr, string) GetFocusedWindow()
 	{
 		var activeWindow = User32.GetForegroundWindow().DangerousGetHandle();
+		var className = GetWindowName(activeWindow);
+		return (activeWindow, className);
+	}
 
+	private static string GetWindowName(IntPtr windowHandle)
+	{
 		// Get class name of the active window
 		var classNameBuilder = new StringBuilder(256);
-		User32.GetClassName(activeWindow, classNameBuilder, classNameBuilder.Capacity);
+		User32.GetClassName(windowHandle, classNameBuilder, classNameBuilder.Capacity);
 
 		var className = classNameBuilder.ToString();
-		return (activeWindow, className);
+		return className;
 	}
 
 	private static void CallAltTab()
 	{
-		SendKeys.SendWait("%{Tab}");
-		SendKeys.Flush();
-		Thread.Sleep(10);
+		const int delay = 10;
+		Thread.Sleep(delay);
+		PInvoke.keybd_event((byte)VIRTUAL_KEY.VK_MENU,0xb8,0 , 0); //Alt Press
+		Thread.Sleep(delay);
+		PInvoke.keybd_event((byte)VIRTUAL_KEY.VK_TAB,0x8f,0 , 0); // Tab Press
+		Thread.Sleep(delay);
+		PInvoke.keybd_event((byte)VIRTUAL_KEY.VK_TAB,0x8f, KEYBD_EVENT_FLAGS.KEYEVENTF_KEYUP,0); // Tab Release
+		Thread.Sleep(delay);
+		PInvoke.keybd_event((byte)VIRTUAL_KEY.VK_MENU,0xb8,KEYBD_EVENT_FLAGS.KEYEVENTF_KEYUP,0); // Alt Release
+		Thread.Sleep(delay);
+		//SendKeys.SendWait("%{Tab}");
+		//SendKeys.Flush();
+		//Thread.Sleep(10);
 	}
 
 	private static void LaunchWindowsTerminalInDirectory(string directory)
