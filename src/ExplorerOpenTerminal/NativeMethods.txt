@@ -7,3 +7,4 @@ ShellWindows
 
 IServiceProvider
 SID_STopLevelBrowser
+keybd_event

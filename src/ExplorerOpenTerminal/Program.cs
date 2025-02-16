@@ -23,7 +23,7 @@ public class Program
 		var (activeWindow, className) = GetFocusedWindow();
 		if (className is not "CabinetWClass")
 		{
-			System.Windows.Forms.SendKeys.SendWait("%{Tab}");
+			CallAltTab();
 			(activeWindow, className) = GetFocusedWindow();
 		}
 		if (className is not "CabinetWClass")
@@ -52,6 +52,13 @@ public class Program
 
 		var className = classNameBuilder.ToString();
 		return (activeWindow, className);
+	}
+
+	private static void CallAltTab()
+	{
+		SendKeys.SendWait("%{Tab}");
+		SendKeys.Flush();
+		Thread.Sleep(10);
 	}
 
 	private static void LaunchWindowsTerminalInDirectory(string directory)
