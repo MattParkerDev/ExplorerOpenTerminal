@@ -21,7 +21,7 @@ public class Program
 	public static void Main()
 	{
 		// do not start the shortcut to this as minimised - minimised windows are not allowed to set focus to other windows
-		Thread.Sleep(500);
+		Thread.Sleep(500); // This allows the current process to become the foreground window
 		var thisHandle = Process.GetCurrentProcess().MainWindowHandle;
 		//PInvoke.SetFocus(new HWND(thisHandle));
 		var previouslyActiveHandle = PInvoke.SetActiveWindow(new HWND(thisHandle));
