@@ -1,4 +1,4 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Diagnostics;
 using System.Text;
 using Windows.Win32;
 using Windows.Win32.UI.Shell;
@@ -32,9 +32,28 @@ class Program
 
         var folderPath = GetActiveExplorerPath(activeWindow);
         Console.WriteLine("Active Explorer Path: " + folderPath);
-
-        //Console.ReadLine();
+        if (string.IsNullOrWhiteSpace(folderPath))
+		{
+	        Console.WriteLine("Active explorer path is null, returning");
+	        return;
+		}
+        LaunchWindowsTerminalInDirectory(folderPath);
     }
+
+    private static void LaunchWindowsTerminalInDirectory(string directory)
+	{
+	    var process = new Process
+	    {
+		    StartInfo = new ProcessStartInfo
+		    {
+			    FileName = "wt",
+			    Arguments = $"""-d "{directory}" """,
+			    UseShellExecute = false,
+			    CreateNoWindow = true,
+		    }
+	    };
+	    process.Start();
+	}
 
     static string? GetActiveExplorerPath(IntPtr activeWindow)
     {
