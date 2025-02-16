@@ -23,3 +23,7 @@ e.g. Ctrl+Alt+A
 Alternatively, the program can be invoked by pinning it to the task bar and invoking via Win+{{Index on the task bar}} e.g. Win+1
 
 ![explorerOpenTerminalpin](https://github.com/user-attachments/assets/e6026bbd-87de-4834-9fa1-4afadec09aa7)
+
+## Notes
+* The release binary only supports x64. You can compile for x86 if desired by updating `<PlatformTarget>x64</PlatformTarget>` in `ExplorerOpenTerminal.csproj` to x86 and running `publish.bat` 🙂
+* The .NET 9 runtime is required to be installed, as the binary is published as `--self-contained false`
