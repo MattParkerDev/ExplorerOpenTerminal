@@ -18,14 +18,14 @@ public class Program
 	[STAThread]
 	public static void Main()
 	{
-		var activeWindow = User32.GetForegroundWindow().DangerousGetHandle();
-
-		// Get class name of the active window
-		var classNameBuilder = new StringBuilder(256);
-		User32.GetClassName(activeWindow, classNameBuilder, classNameBuilder.Capacity);
-
-		var className = classNameBuilder.ToString();
-		// Check if the active window is a Windows Explorer instance
+		//SendKeys.Send("%{Tab}");
+		//Thread.Sleep(500);
+		var (activeWindow, className) = GetFocusedWindow();
+		if (className is not "CabinetWClass")
+		{
+			System.Windows.Forms.SendKeys.SendWait("%{Tab}");
+			(activeWindow, className) = GetFocusedWindow();
+		}
 		if (className is not "CabinetWClass")
 		{
 			Console.WriteLine("Active window is not an Explorer window.");
@@ -40,6 +40,18 @@ public class Program
 			return;
 		}
 		LaunchWindowsTerminalInDirectory(folderPath);
+	}
+
+	private static (IntPtr, string) GetFocusedWindow()
+	{
+		var activeWindow = User32.GetForegroundWindow().DangerousGetHandle();
+
+		// Get class name of the active window
+		var classNameBuilder = new StringBuilder(256);
+		User32.GetClassName(activeWindow, classNameBuilder, classNameBuilder.Capacity);
+
+		var className = classNameBuilder.ToString();
+		return (activeWindow, className);
 	}
 
 	private static void LaunchWindowsTerminalInDirectory(string directory)
