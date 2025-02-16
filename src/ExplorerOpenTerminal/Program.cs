@@ -20,24 +20,22 @@ public class Program
 	[STAThread]
 	public static void Main()
 	{
-		// do not start the shortcut to this as minimised - minimised windows are not allowed to set focus to other windows
+		// if this program is started via a shortcut, the window that is focused is Shell_TrayWnd, which is the taskbar
+		// Shell_TrayWnd does not like calling alt tab, so we just wait a bit
+		// Waiting however, does not change what the foreground window is, it just prevents alt tab getting stuck
 
-		Thread.Sleep(500); // This allows the current process to become the foreground window
-		var (activeWindow, className) = GetFocusedWindow();
+		var (activeWindow, className) = GetForegroundWindow();
+		if (className is "Shell_TrayWnd")
+		{
+			Thread.Sleep(100);
+			(activeWindow, className) = GetForegroundWindow();
+		}
 
-		// var thisHandle = Process.GetCurrentProcess().MainWindowHandle;
-		// if (thisHandle != activeWindow)
-		// {
-		// 	var previouslyActiveHandle = PInvoke.SetActiveWindow(new HWND(thisHandle));
-		// 	Console.WriteLine("Previously active Window Handle: " + previouslyActiveHandle);
-		// }
-
-		//(activeWindow, className) = GetFocusedWindow();
 		if (className is not "CabinetWClass")
 		{
 			Console.WriteLine($"Active window ({className}) is not an Explorer window, calling Alt+Tab");
 			CallAltTab();
-			(activeWindow, className) = GetFocusedWindow();
+			(activeWindow, className) = GetForegroundWindow();
 		}
 		if (className is not "CabinetWClass")
 		{
@@ -55,7 +53,7 @@ public class Program
 		LaunchWindowsTerminalInDirectory(folderPath);
 	}
 
-	private static (IntPtr, string) GetFocusedWindow()
+	private static (IntPtr, string) GetForegroundWindow()
 	{
 		var activeWindow = User32.GetForegroundWindow().DangerousGetHandle();
 		var className = GetWindowName(activeWindow);
@@ -98,7 +96,7 @@ public class Program
 				FileName = "wt",
 				Arguments = $"""-d "{directory}" """,
 				UseShellExecute = false,
-				CreateNoWindow = true,
+				CreateNoWindow = false,
 			}
 		};
 		process.Start();
