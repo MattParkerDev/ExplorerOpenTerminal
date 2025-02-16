@@ -6,6 +6,7 @@
 	<PlatformTarget>x64</PlatformTarget> <!-- Required to generate some IShellBrowser related methods (CsWin32) -->
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <PublishSingleFile>true</PublishSingleFile>
   </PropertyGroup>
 
   <ItemGroup>
