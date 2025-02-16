@@ -18,5 +18,8 @@ e.g. Ctrl+Alt+A
 
 5. Have an explorer open where you wish to open a terminal
 6. Press your shortcut key!
+<br>
 
 Alternatively, the program can be invoked by pinning it to the task bar and invoking via Win+{{Index on the task bar}} e.g. Win+1
+
+![explorerOpenTerminalpin](https://github.com/user-attachments/assets/e6026bbd-87de-4834-9fa1-4afadec09aa7)
