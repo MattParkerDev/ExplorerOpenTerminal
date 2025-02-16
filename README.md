@@ -6,7 +6,7 @@ e.g. Ctrl+Alt+A
 ![explorerOpenTerminal](https://github.com/user-attachments/assets/84e96531-90f6-4e6f-a0d8-b74bf7058f36)
 
 ## How to use
-1. Download the latest version from ![releases](/releases)
+1. Download the latest version from ![releases](https://github.com/MattParkerDev/ExplorerOpenTerminal/releases)
 2. Save somewhere such as `C:/Users/Matt/Documents/ExplorerOpenTerminal/ExplorerOpenTerminal-v1.0.0.exe`
 3. Add a shortcut to the exe on the desktop
 
