@@ -18,16 +18,7 @@ public static class Program
 	[STAThread]
 	public static void Main()
 	{
-		// if this program is started via a shortcut, the window that is focused is Shell_TrayWnd, which is the taskbar
-		// Shell_TrayWnd does not like calling alt tab, so we just wait a bit
-		// Waiting however, does not change what the foreground window is, it just prevents alt tab getting stuck
-
 		var (activeWindow, className) = GetForegroundWindow();
-		if (className is "Shell_TrayWnd")
-		{
-			Thread.Sleep(100);
-			(activeWindow, className) = GetForegroundWindow();
-		}
 
 		if (className is not "CabinetWClass")
 		{
