@@ -118,15 +118,15 @@ public static class Program
 	private static string? GetActiveExplorerTabPath(IntPtr hwnd)
 	{
 		// The first result is the active tab
-		IntPtr activeTab = PInvoke.FindWindowEx(new HWND(hwnd), new HWND(IntPtr.Zero), "ShellTabWindowClass", null);
+		var activeTab = PInvoke.FindWindowEx(new HWND(hwnd), new HWND(IntPtr.Zero), "ShellTabWindowClass", null);
 
-		var shellWindows123 = (IShellWindows)new ShellWindows();
-		Guard.Against.Null(shellWindows123);
-		for (var i = 0; i < shellWindows123.Count; i++)
+		var shellWindows = (IShellWindows)new ShellWindows();
+		Guard.Against.Null(shellWindows);
+		for (var i = 0; i < shellWindows.Count; i++)
 		{
-			var windowObject = shellWindows123.Item(i);
+			var windowObject = shellWindows.Item(i);
 			dynamic window = windowObject;
-			var windowPointer = new IntPtr(window.HWND);
+			var windowPointer = (IntPtr)window.HWND;
 			if (window == null || windowPointer != hwnd)
 				continue;
 
